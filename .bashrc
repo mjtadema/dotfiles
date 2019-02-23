@@ -33,15 +33,16 @@ MDSSH()
 {
 # When ssh target starts with md, deconstruct the string and hop to the correct md machine.
 # Otherwise, just give the usual ssh command.
-        cmdargs=$@
-	case $1 in
-		md*)
-			target=$1
-			;;
-		*)
-			shift
-			;;
-	esac
+        cmdargs=($@)
+	while true
+	do
+		case $1 in
+			md*)	target=$1 ;;
+			*)	shift ;;
+		esac
+		# Emulated do-while loop	
+		[[ $# -gt 1 ]] || break
+	done
         if [ "${target:0:2}" == "md" ]
         then
 		cmdargs=($(echo ${cmdargs[@]} | sed 's/md..//'))
