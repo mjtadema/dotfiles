@@ -10,7 +10,7 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$ '
 #### Sources ####
 if [[ -z $gmxpath ]]
 then
-	if [[ $(pacman -Qq gromacs) ]]
+	if [[ $(pacman -Qq gromacs &> /dev/null) ]]
 	then
 		export gmxpath=$(pacman -Ql gromacs | grep "/bin/gmx$" | cut -f2 -d' ')
 	. ${gmxpath%gmx}/GMXRC.bash
