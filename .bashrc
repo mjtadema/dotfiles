@@ -20,6 +20,8 @@ fi
 
 #### Exports ####
 export EDITOR="vim"
+export PATH="$PATH:$HOME/.local/bin/"
+export TODAY="$(date +%d-%m-%y)"
 
 #### Bindings ####
 bind '"\e[A":history-search-backward'
