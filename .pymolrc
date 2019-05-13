@@ -1,0 +1,3 @@
+#run ~/show_bumps.py
+run $HOME/.pymol/axes.py
+run $HOME/.pymol/pycg_bonds.py
