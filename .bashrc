@@ -31,31 +31,42 @@ bind '"\e[B":history-search-forward'
 # Calculate
 =(){ awk "BEGIN{ print $* }" ;}
 
-MDSSH()
-{
+_ssh(){
 # When ssh target starts with md, deconstruct the string and hop to the correct md machine.
 # Otherwise, just give the usual ssh command.
-        cmdargs=($@)
-	while true
-	do
-		case $1 in
-			md*)	target=$1 ;;
-			*)	shift ;;
-		esac
-		# Emulated do-while loop	
-		[[ $# -gt 1 ]] || break
-	done
-        if [ "${target:0:2}" == "md" ]
-        then
-		cmdargs=($(echo ${cmdargs[@]} | sed 's/md..//'))
-                \ssh -o ProxyCommand="ssh -q md nc -q0 $1 22" ${cmdargs[@]} $target
-        else
-                \ssh ${cmdargs[@]}
-        fi
-}; alias ssh='MDSSH'
+    local target
+    target=$(echo $@ | grep -o "md[0-9][0-9]")
+    if [ $target ]
+    then
+        local cmdargs
+    	cmdargs=$(echo "$@" | sed "s/$target//")
+        \ssh $cmdargs -o ProxyCommand="ssh -q md nc -q0 $target 22" $target
+    else
+        \ssh $@
+    fi
+}; alias ssh='_ssh'
+
+updmrs(){
+    # Check for reflector 
+    \pacman -Qq reflector &> /dev/null || sudo \pacman -S reflector || return 1
+    local="es" # currently living in spain
+    cc=()
+    if [[ $# -eq 0 ]]
+    then
+        cc+="-c ${local}"
+    fi
+    while [[ $# -ge 1 ]]
+    do
+        case $1 in
+            *) cc+="-c ${1} "; shift ;;
+        esac
+    done
+    sudo sh -c "reflector $cc | tee /etc/pacman.d/mirrorlist"
+}
 
 #### Aliases ####
 alias q='exit'
 alias ls='ls --color=auto'
 alias ll='ls -lh'
 alias open='xdg-open'
+alias ROSETTARC=". $HOME/.local/bin/ROSETTARC"
